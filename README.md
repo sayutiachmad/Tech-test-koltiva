@@ -1,3 +1,5 @@
+This application is using CodeIgniter 3
+
 Database is located at db folder
 Database name is koltiva_test_app
 
