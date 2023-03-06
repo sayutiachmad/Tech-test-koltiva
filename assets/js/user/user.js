@@ -10,6 +10,7 @@ var cropper;
 var cropBoxData;
 var canvasData;
 
+
 jQuery(document).ready(function($) {
 
 
@@ -68,6 +69,8 @@ jQuery(document).ready(function($) {
                     opt += '</button>';
                     opt += '<div class="dropdown-menu pull-right">';
                     opt += '<a href="javascript:void(0);" class="dropdown-item action_edit"><i class="fa fa-edit"></i> Edit</a>';
+                    opt += '<a href="javascript:void(0);" class="dropdown-item image_upload"><i class="fa fa-edit"></i> Change Avatar</a>';
+                    opt += '<input type="file" class="inputfile image_upload" style="display:none;">';
                     opt += '<a href="javascript:void(0);" class="dropdown-item action_remove"><i class="fa fa-trash"></i> Delete</a>';
                     opt += '</div>';
                     opt += '</div>';
@@ -161,6 +164,7 @@ jQuery(document).ready(function($) {
     $('#table_for_data tbody').on('click touchstart', '.image_upload' , function(){
         $(this).val('');
     });
+
 
     $('#table_for_data tbody').on('change', '.image_upload', function(event) {
         $('#modal_form_img').trigger('shown.bs.modal');

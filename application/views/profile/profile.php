@@ -23,7 +23,8 @@
               <li class="list-group-item">
                 <div class="caption">
                     <center>
-                        <div class="blur"><input type="file" id="image_upload" class="inputfile"><label for="image_upload"><i class="fas fa-camera"></i> Ubah Foto Profile</label></div>
+                        <a href="javascript:;" id="show-change-avatar-input" class="btn btn-link"><i class="fas fa-camera"></i> Ubah Foto Profile</a>
+                        <div class="blur"><input type="file" id="image_upload" class="inputfile" style="display: none;"></div>
                     </center>
                     <div class="caption-text">
                         

@@ -5,35 +5,54 @@ var img = document.getElementById('img_cropper');
 var cropper;
 var cropBoxData;
 var canvasData;
+var input = $('#image_upload');
+var $modal = $("#modal_form");
 
 
 $(document).ready(function() {
 
-    $('#image_upload').on('click touchstart' , function(){
-        $(this).val('');
+    $('#show-change-avatar-input').on('click', function(){
+        $(input).trigger('click');
     });
 
-    $("#image_upload").on('change', function(event) {
-        $('#modal_form').modal({
-            backdrop: 'static',
-            keyboard: false
-        });
-        readURL(this);
-    });
+    input.on('change', function (e) {
+        var files = e.target.files;
+        var done = function (url) {
+            input.value = '';
+            img.src = url;
+            $modal.modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+        };
+        var reader;
+        var file;
+        var url;
 
-    $('#modal_form').on('shown.bs.modal', function () {
-            cropper = new Cropper(img, {
-                autoCropArea: 1,
-                aspectRatio: 1  /1,
-                ready: function () {
-                    // Strict mode: set crop box data first
-                    cropper.setCropBoxData(cropBoxData).setCanvasData(canvasData);
+        if (files && files.length > 0) {
+            file = files[0];
+
+            if (URL) {
+                done(URL.createObjectURL(file));
+            } else if (FileReader) {
+                reader = new FileReader();
+                reader.onload = function (e) {
+                done(reader.result);
+                };
+                reader.readAsDataURL(file);
             }
+        }
+    });
+
+
+    $modal.on('shown.bs.modal', function () {
+        cropper = new Cropper(img, {
+            aspectRatio: 1,
+            viewMode: 3,
         });
     }).on('hidden.bs.modal', function () {
-        cropBoxData = cropper.getCropBoxData();
-        canvasData = cropper.getCanvasData();
         cropper.destroy();
+        cropper = null;
     });
 
         $('#btn_upload_logo').click(function(event) {
@@ -266,7 +285,7 @@ function load_img(){
     .done(function(response) {
         data = JSON.parse(response)
         if(data.image!=false){
-            $('.profile-picture').attr('src', base_url+data.image['image'].replace('./',''));
+            $('.profile-user-img').attr('src', base_url+data.image['image'].replace('./',''));
         }
     })
     .fail(function() {
