@@ -159,3 +159,4 @@ define('F_USER_NAV_USER','id_user');
 define('UNDELETED','deleted IS NULL');
 define('DELETED','deleted IS NOT NULL');
 define('BLANK_PROFILE_PICTURE','blank_pic.png');
+define('VALUE_NOT_EXIST','not_exist');

@@ -35,6 +35,8 @@
                     </thead>
                     <tbody></tbody>
                 </table>
+
+                <input type="file" id="image_upload" style="display:none;">
             </div>
           </div>
         </div>
@@ -205,6 +207,75 @@
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary" id="btn_submit_edit">SIMPAN</button>
                     <button type="button" class="btn btn-olive font-bold" data-dismiss="modal">CLOSE</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_form_edit_password" tabindex="-1" role="dialog" style="display: none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modal_label">Ubah Password</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                    
+            </div>
+            <form class="form-horizontal" id="mp_form_edit_password" method="POST">
+                <div class="modal-body">
+                    <div class="row-clearfix">
+                        <div id="alert_modal_cp" class="alert bg-red alert-dismissible" role="alert" style="display: none;">
+                            <span id="alert_msg_cp"></span>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix">
+                        <div class="col-12 col-md-4 control-label">
+                            <label for="password_2">Old Password</label>
+                        </div>
+                        <div class="col-12 col-md-7">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="password" name="pr_old_password_" class="form-control" placeholder="Old Password">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix">
+                        <div class="col-12 col-md-4 control-label">
+                            <label for="password_2">New Password</label>
+                        </div>
+                        <div class="col-12 col-md-7">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="password" name="pr_new_password_" class="form-control" placeholder="New Password">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix">
+                        <div class="col-12 col-md-4 control-label">
+                            <label for="password_2">Confirm Password</label>
+                        </div>
+                        <div class="col-12 col-md-7">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="password" name="pr_confirm_new_password_" class="form-control" placeholder="Confirm Password">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="pr_user_code_">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" id="btn-submit-change-password">SIMPAN</button>
+                    <button type="button" class="btn btn-olive font-bold" data-dismiss="modal" >CLOSE</button>
                 </div>
             </form>
         </div>

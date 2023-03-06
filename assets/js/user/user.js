@@ -9,6 +9,8 @@ var img = document.getElementById('img_cropper');
 var cropper;
 var cropBoxData;
 var canvasData;
+var input = $('#image_upload');
+var $modal = $("#modal_form_img");
 
 
 jQuery(document).ready(function($) {
@@ -69,8 +71,8 @@ jQuery(document).ready(function($) {
                     opt += '</button>';
                     opt += '<div class="dropdown-menu pull-right">';
                     opt += '<a href="javascript:void(0);" class="dropdown-item action_edit"><i class="fa fa-edit"></i> Edit</a>';
-                    opt += '<a href="javascript:void(0);" class="dropdown-item image_upload"><i class="fa fa-edit"></i> Change Avatar</a>';
-                    opt += '<input type="file" class="inputfile image_upload" style="display:none;">';
+                    opt += '<a href="javascript:void(0);" class="dropdown-item action_change_password"><i class="fa fa-circle"></i> Edit Password</a>';
+                    opt += '<a href="javascript:void(0);" class="dropdown-item show-change-avatar-input"><i class="fa fa-image"></i> Change Avatar</a>';
                     opt += '<a href="javascript:void(0);" class="dropdown-item action_remove"><i class="fa fa-trash"></i> Delete</a>';
                     opt += '</div>';
                     opt += '</div>';
@@ -107,6 +109,11 @@ jQuery(document).ready(function($) {
 
     $('#table_for_data tbody').on('click','.action_remove',function(){
         remove_data(grid.row($(this).parents('tr')).data().id_user);
+    });
+
+    $('#table_for_data tbody').on('click','.action_change_password',function(){
+        $('#modal_form_edit_password').modal('show');
+        $('[name="pr_user_code_"]').val(grid.row($(this).parents('tr')).data().id_user);
     });
 
 
@@ -158,37 +165,87 @@ jQuery(document).ready(function($) {
         }
     });
 
+    validate_password = $('#mp_form_edit_password').validate({
+        rules:{
+            pr_old_password_:{
+                required:true,
+            },
+            pr_new_password_:{
+                required:true,
+            },
+            pr_confirm_new_password_:{
+                required:true,
+                equalTo:"[name='pr_new_password_']"
+            }
+
+        },
+        messages:{
+            pr_confirm_new_password_:{
+                equalTo:"Password baru tidak sama"
+            }
+        },
+        highlight: function (input) {
+            $(input).parents('.form-line').addClass('error');
+        },
+        unhighlight: function (input) {
+            $(input).parents('.form-line').removeClass('error');
+        },
+        errorPlacement: function (error, element) {
+            $(element).parents('.form-group').append(error);
+        },
+        submitHandler: function(form) {
+            save_password();
+        }
+    });
+
     reloadTable();
     addForm();
 
-    $('#table_for_data tbody').on('click touchstart', '.image_upload' , function(){
-        $(this).val('');
+    $('#table_for_data tbody').on('click touchstart', '.show-change-avatar-input' , function(){
+        $(input).trigger('click');
+        $('[name="pr_user_code_"]').val(grid.row($(this).parents('tr')).data().id_user);
     });
 
 
-    $('#table_for_data tbody').on('change', '.image_upload', function(event) {
-        $('#modal_form_img').trigger('shown.bs.modal');
-        $('#modal_form_img').modal('show');
-        readURL(this);
-        $('[name="pr_user_code_"').val(grid.row($(this).parents('tr')).data().id_user)
-    });
+    input.on('change', function (e) {
+        var files = e.target.files;
+        var done = function (url) {
+            input.value = '';
+            img.src = url;
+            $modal.modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+        };
+        var reader;
+        var file;
+        var url;
 
-    $('#modal_form_img').on('shown.bs.modal', function () {
-            cropper = new Cropper(img, {
-                autoCropArea: 1,
-                aspectRatio: 1  /1,
-                ready: function () {
-                    // Strict mode: set crop box data first
-                    cropper.setCropBoxData(cropBoxData).setCanvasData(canvasData);
+        if (files && files.length > 0) {
+            file = files[0];
+
+            if (URL) {
+                done(URL.createObjectURL(file));
+            } else if (FileReader) {
+                reader = new FileReader();
+                reader.onload = function (e) {
+                done(reader.result);
+                };
+                reader.readAsDataURL(file);
             }
+        }
+    });
+
+
+    $modal.on('shown.bs.modal', function () {
+        cropper = new Cropper(img, {
+            aspectRatio: 1,
+            viewMode: 3,
         });
     }).on('hidden.bs.modal', function () {
-        cropBoxData = cropper.getCropBoxData();
-        canvasData = cropper.getCanvasData();
         cropper.destroy();
+        cropper = null;
     });
-
-    
 
     $('#btn_upload_logo').click(function(event) {
         try {
@@ -231,7 +288,7 @@ jQuery(document).ready(function($) {
                                         var msg;
                                         if(parsed.result){
                                             msg = "Berhasil mengunggah gambar!";
-                                            $('#modal_form_img').modal('toggle');
+                                            $modal.modal('toggle');
                                             cropper.reset();
                                             grid.ajax.reload();
                                         }else{
@@ -406,6 +463,55 @@ function remove_data(code){
 
             },
         }
+    });
+}
+
+function save_password(){
+    $('#alert_msg_cp').html("");
+    $('#alert_modal_cp').hide();
+    var form_data = $('#mp_form_edit_password').serialize();
+    $('#btn-submit-change-password').html('<i class="fas fa-sync-alt fa-spin"></i> Processing...').attr('disabled','true');
+    $.ajax({
+        url: base_url+'profile/change_password',
+        type: 'POST',
+        data: form_data
+    })
+    .done(function(data) {
+        var parsed = JSON.parse(data);
+        if(parsed.result){
+            if(parsed.result==true){
+                notif_msg = "Berhasil menyimpan data!";
+                showNotification("bg-green", notif_msg, "top", "right", null, null);
+                $(':password').val('');
+                $('#mp_form_edit_password')[0].reset();
+                grid.ajax.reload();
+                $('#modal_form_edit_password').modal('hide');
+            }else{
+                if(parsed.result=='not_match'){
+                    notif_msg = "Gagal menyimpan data, Password baru dan konfirmasi password baru tidak cocok";
+                    $('#alert_msg_cp').html(notif_msg);
+                    $('#alert_modal_cp').show();
+                }else if(parsed.result=='not_exist'){
+                    notif_msg = "Gagal menyimpan data, Password lama tidak cocok";
+                    $('#alert_msg_cp').html(notif_msg);
+                    $('#alert_modal_cp').show();
+                }else{
+                    notif_msg = "Oops! Gagal menyimpan data!";
+                    $('#alert_msg_cp').html(notif_msg);
+                    $('#alert_modal_cp').show();
+                }
+            }
+        }else{
+            notif_msg = "Oops! Gagal menyimpan data!";
+            showNotification("alert-danger", notif_msg, "top", "right", null, null);
+        }
+    })
+    .fail(function() {
+        notif_msg = "Oops! Terjadi kesalahan saat megirim data";
+        showNotification("alert-danger", notif_msg, "top", "right", null, null);
+    })
+    .always(function() {
+        $('#btn-submit-change-password').html('<i class="fas fa-check"></i> Submit').removeAttr('disabled');
     });
 }
 
